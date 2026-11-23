@@ -70,7 +70,7 @@ See [`DECISIONS.md`](DECISIONS.md), entries of 2026-11-23.
 - **Group 4 gaps (53 days):** not in the data → treated as unknown, not as 0.
 - **Group 6:** forecast only on days when seasonal bread is on sale (manager knows this in advance).
 - **Kiel Week:** missing after the join → 0 (file lists only Kiel Week days).
-- **Wettercode:** not used (669 missing, not at random).
+- **Wettercode:** not used in training (669 missing, not at random). In data exploration only, "rain" = codes 60–69 (narrow, conservative); missing codes stay a separate group.
 - **Missing weather (3 sales days, 13 test days; `Bewoelkung` 10 days):** filled with the previous day's value (forward fill, past only).
 - **31 December peaks (group 5):** kept; a "New Year's Eve" feature will be added.
 
