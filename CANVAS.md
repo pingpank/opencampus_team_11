@@ -24,7 +24,12 @@ The **branch manager** decides **every day at closing time** how much of each of
 - *Answer looks like:* one number in € per group for the next day, plus the typical error (MAPE) of the model for that group.
 - *Data can answer:* daily turnover per group 2013-07-01 – 2018-07-31, with weekday, holidays, Kiel Week and weather as possible influences.
 - *Data cannot answer:* number of pieces to bake (no prices); true demand on sold-out days; anything about other branches.
-- *Thin basis:* group 6 (seasonal bread) – only 4 seasons (2013–2017), 292 days; result reported separately and flagged as uncertain. Kiel Week effect rests on only 6 Kiel Weeks.
+- *Thin basis:* group 6 (seasonal bread) – only 5 seasons (2013/14 – 2017/18), 292 days; result reported separately and flagged as uncertain. Kiel Week effect rests on only 5 Kiel Weeks (2014–2018).
+
+**Hypotheses about what drives sales** (team, 2026-11-23; not yet tested):
+1. **Warm and dry weather → higher croissant sales (group 3).** *Data:* temperature available; "dry" needs `Wettercode`, which is currently not used (see Open questions). *Limit:* measured weather as forecast stand-in; separate weather from season.
+2. **During Kiel Week → more roll sales (group 2).** *Data:* `KielerWoche` flag. *Limit:* only 5 Kiel Weeks (2014–2018) – a thin basis.
+3. **On rainy days → lower cake sales (group 5).** *Data:* "rainy" needs `Wettercode` (not used); `Bewoelkung` is only a rough stand-in. *Limit:* as for 1.
 
 ### 3. Audiences 👤
 <!-- Who receives which result, in which form? At least: the decision-maker and the technical reader. -->
@@ -44,6 +49,12 @@ The **branch manager** decides **every day at closing time** how much of each of
 
 ### 5. Data 🤖
 <!-- Sources, unit of observation, period covered, keys, known gaps. Link the data fact sheet. -->
+Details: [`docs/data-fact-sheet.md`](docs/data-fact-sheet.md). Source: meteolytix GmbH via opencampus.sh course; license not stated.
+- **Sales:** 9,334 rows, one per (day, product group), only days with sales; 2013-07-01 – 2018-07-31. Key (`Datum`, `Warengruppe`) unique. 38 days without any sales (holidays); group 4 missing on 53 further days (2013–2016); group 6 only late Oct – early Jan (5 seasons). 31 Dec = extreme peak in group 5.
+- **Weather (observed, Kiel):** 2012-01-01 – 2019-08-01, 169 days without a row (3 in sales period, 13 in test period). `Wettercode` missing on 669 days, not at random (calmer, warmer days); `Bewoelkung` missing on 10 days.
+- **Kiel Week:** 9 days per year 2012–2019; 5 Kiel Weeks inside the sales period.
+- **Joins:** left joins on `Datum` keep 9,334 rows.
+- **Test period** 2018-08-01 – 2019-07-31 held back by the course.
 
 ### 6. Known in advance 👤
 <!-- What information is available at the moment the result is needed? Everything else is leakage. -->
@@ -53,9 +64,23 @@ The **branch manager** decides **every day at closing time** how much of each of
 
 ### 7. Data decisions 👤
 <!-- Joins, missing values, encodings, exclusions, each with a reason. Link the entries in DECISIONS.md. -->
+See [`DECISIONS.md`](DECISIONS.md), entries of 2026-11-23.
+- **Join:** sales file is the base; weather and Kiel Week are left-joined on `Datum` (9,334 rows stay 9,334). No days or zeros are added.
+- **Closed days (38):** not in the data → no training, no forecast.
+- **Group 4 gaps (53 days):** not in the data → treated as unknown, not as 0.
+- **Group 6:** forecast only on days when seasonal bread is on sale (manager knows this in advance).
+- **Kiel Week:** missing after the join → 0 (file lists only Kiel Week days).
+- **Wettercode:** not used (669 missing, not at random).
+- **Missing weather (3 sales days, 13 test days; `Bewoelkung` 10 days):** filled with the previous day's value (forward fill, past only).
+- **31 December peaks (group 5):** kept; a "New Year's Eve" feature will be added.
 
 ### 8. Checks 🤖
 <!-- Checkpoints and the invariants that must hold at each (row counts, keys, date ranges, IDs, baseline). Link checks/. -->
+Confirmed by the team on 2026-11-23. Run with `uv run pytest checks` ([`checks/`](checks/)). Status: only the starter check (data loads) is implemented so far.
+1. **Raw data:** (`Datum`, `Warengruppe`) unique; `id` = YYMMDD·10 + group; `Umsatz` > 0 and never missing; `Warengruppe` only 1–6; dates 2013-07-01 – 2018-07-31.
+2. **Join:** still 9,334 rows after the joins; `KielerWoche` only 0/1 with exactly 45 days = 1; no missing weather values after forward fill.
+3. **Time & leakage:** training strictly before validation; no date ≥ 2018-08-01 in training; lag features from the past only (e.g. lag-1 = previous day's turnover).
+4. **Content & baseline:** group 6 only in Oct–Jan; weekdays ordered Mon–Sun; MAPE of the last-week rule is computed and plausible (> 0 %).
 
 ---
 
@@ -76,6 +101,7 @@ The **branch manager** decides **every day at closing time** how much of each of
 <!-- Parking lot. Each item names who resolves it. -->
 - **Staffing:** could the same forecast support staff planning? Parked; later use. *Resolves: team.*
 - **Current practice:** how does the branch decide baking quantities today without a model? Unknown; the naive rule "same weekday last week" serves as stand-in reference (block 4). *Resolves: team, if instructors can tell.*
+- **Rain / dry for hypotheses 1 and 3:** these need `Wettercode`, which was decided not to be used (DECISIONS 2026-11-23). Use it after all (e.g. as a simple rain yes/no flag, missing = no notable weather), or test with `Bewoelkung` as a rough stand-in? *Resolves: team.*
 - **Data split:** how to split training / validation (by time, test period Aug 2018 – Jul 2019 set by the course). *Resolves: team, before the first model.*
 
 ## Decision log
