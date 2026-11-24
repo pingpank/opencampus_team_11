@@ -11,6 +11,7 @@ Team 11: Thore Pingpank, Anne Eilrich, Lennard Goronzy, Katharina Helzel.
 
 - Sales, weather and Kiel Week data: see the [dataset documentation](https://github.com/opencampus-sh/intro-to-data-science-and-ml/blob/main/data/bakery/README.md). Load the files from `https://raw.githubusercontent.com/opencampus-sh/intro-to-data-science-and-ml/main/data/bakery/`.
 - Additional data sources: [list them with link and the variables created from them]
+- Event calendar: `0_DataPreparation/events.csv` (columns `Datum`, `tag`; one row per event day), tags documented in `0_DataPreparation/EVENTS.md`. Started from the Kiel Week file (tag `kiwo`).
 
 ## Conventions
 
