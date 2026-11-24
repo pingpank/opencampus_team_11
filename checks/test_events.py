@@ -63,3 +63,17 @@ def test_special_days_once_per_year():
     assert special.query("tag == 'special_silvester'")["Datum"].str.endswith("-12-31").all()
     weekdays = pd.to_datetime(special.query("tag in ['special_ostersonntag', 'special_pfingstsonntag']")["Datum"]).dt.dayofweek
     assert (weekdays == 6).all()  # both are Sundays
+
+
+def test_home_games_per_season():
+    # Home match days per season (July-June), 2013/14-2018/19, as documented in EVENTS.md
+    events = load_events()
+    expected = {
+        "match_holstein": {2013: 19, 2014: 21, 2015: 20, 2016: 19, 2017: 19, 2018: 19},
+        "match_thw": {2013: 25, 2014: 27, 2015: 27, 2016: 26, 2017: 26, 2018: 25},
+    }
+    for tag, per_season in expected.items():
+        dates = pd.to_datetime(events.loc[events["tag"] == tag, "Datum"])
+        assert dates.between("2013-07-01", "2019-07-31").all(), tag
+        season = dates.dt.year - (dates.dt.month < 7)
+        assert season.value_counts().sort_index().to_dict() == per_season, tag
