@@ -8,6 +8,12 @@ Newest first. One entry per decision taken at a stop point.
 **Reason:** Hypothesis 1 needs "dry"; only `Wettercode` records precipitation.
 **Alternatives considered:** Cloud cover as stand-in; temperature only.
 **Decided by:** Katharina Helzel
+## 2026-11-23: "Rain" in data exploration = Wettercode 60–69
+**Canvas block:** 7
+**Decision:** Even though `Wettercode` is not used in training, when it is used for data exploration, a "rainy day" is defined narrowly as `Wettercode` 60–69 (rain at the time of observation). All other codes count as "no rain"; days without a code are kept as a separate group "code missing".
+**Reason:** A narrow definition is conservative: it only counts days that clearly had rain, not drizzle, showers, snow or rain in the past hour.
+**Alternatives considered:** Broad definition (codes 20–27, 29 and 50–99: any precipitation now or in the past hour).
+**Decided by:** Thore Pingpank
 
 ## 2026-11-23: Checks for block 8
 **Canvas block:** 8
