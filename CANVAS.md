@@ -91,6 +91,7 @@ Confirmed by the team on 2026-11-23. Run with `uv run pytest checks` ([`checks/`
 
 ### 10. Findings 🤖
 <!-- What we learned, how sure we are, and what the data cannot tell. -->
+- **Hypothesis 1 (warm & dry → croissants): partly supported** (draft, 2026-11-24, [`katharina-warm.ipynb`](1_DatasetCharacteristics/katharina-warm.ipynb)). Raw link with temperature is strong (Spearman 0.65; ~110 € below 5 °C vs. 261 € at ≥ 25 °C), but mostly season: within the same month and weekday it shrinks to rho 0.13 (days > 4 °C warmer than the month's average: ~+6.6 % vs. a typical comparable day). "Dry" not supported: at equal temperature rainy days are not lower (from 15 °C even higher); season-adjusted difference only 1.3 %-points, reversed in summer. Limits: observed weather, one daily rain code, 6 summers, exploration used all 2013–2018 data.
 
 ### 11. Recommendation 👤
 <!-- What the decision-maker should do, under which conditions. Signed off by the team. -->
@@ -101,7 +102,7 @@ Confirmed by the team on 2026-11-23. Run with `uv run pytest checks` ([`checks/`
 <!-- Parking lot. Each item names who resolves it. -->
 - **Staffing:** could the same forecast support staff planning? Parked; later use. *Resolves: team.*
 - **Current practice:** how does the branch decide baking quantities today without a model? Unknown; the naive rule "same weekday last week" serves as stand-in reference (block 4). *Resolves: team, if instructors can tell.*
-- **Rain / dry for hypotheses 1 and 3:** these need `Wettercode`, which was decided not to be used (DECISIONS 2026-11-23). Use it after all (e.g. as a simple rain yes/no flag, missing = no notable weather), or test with `Bewoelkung` as a rough stand-in? *Resolves: team.*
+- **Rain / dry for hypotheses 1 and 3:** these need `Wettercode`, which was decided not to be used (DECISIONS 2026-11-23). Use it after all (e.g. as a simple rain yes/no flag, missing = no notable weather), or test with `Bewoelkung` as a rough stand-in? For hypothesis 1, a rain flag was tried in exploration only (DECISIONS 2026-11-24) and showed no clear effect on croissants. *Resolves: team.*
 - **Data split:** how to split training / validation (by time, test period Aug 2018 – Jul 2019 set by the course). *Resolves: team, before the first model.*
 
 ## Decision log

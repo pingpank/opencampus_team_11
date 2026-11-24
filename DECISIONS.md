@@ -2,6 +2,12 @@
 
 Newest first. One entry per decision taken at a stop point.
 
+## 2026-11-24: Wettercode used as rain flag for exploring hypothesis 1 only
+**Canvas block:** 2, 7
+**Decision:** In `1_DatasetCharacteristics/katharina-warm.ipynb`, a day counts as rainy if `Wettercode` is 50–99 (WMO precipitation codes); a missing code counts as dry. This is an exception for exploration; the modelling decision "Wettercode not used" (2026-11-23) stays unchanged.
+**Reason:** Hypothesis 1 needs "dry"; only `Wettercode` records precipitation.
+**Alternatives considered:** Cloud cover as stand-in; temperature only.
+**Decided by:** Katharina Helzel
 ## 2026-11-23: "Rain" in data exploration = Wettercode 60–69
 **Canvas block:** 7
 **Decision:** Even though `Wettercode` is not used in training, when it is used for data exploration, a "rainy day" is defined narrowly as `Wettercode` 60–69 (rain at the time of observation). All other codes count as "no rain"; days without a code are kept as a separate group "code missing".
