@@ -53,6 +53,7 @@ Details: [`docs/data-fact-sheet.md`](docs/data-fact-sheet.md). Source: meteolyti
 - **Sales:** 9,334 rows, one per (day, product group), only days with sales; 2013-07-01 – 2018-07-31. Key (`Datum`, `Warengruppe`) unique. 38 days without any sales (holidays); group 4 missing on 53 further days (2013–2016); group 6 only late Oct – early Jan (5 seasons). 31 Dec = extreme peak in group 5.
 - **Weather (observed, Kiel):** 2012-01-01 – 2019-08-01, 169 days without a row (3 in sales period, 13 in test period). `Wettercode` missing on 669 days, not at random (calmer, warmer days); `Bewoelkung` missing on 10 days.
 - **Kiel Week:** 9 days per year 2012–2019; 5 Kiel Weeks inside the sales period.
+- **DWD weather (Kiel-Holtenau, added 2026-11-24):** measured rain (mm), sunshine (h), cloud cover, temperature min/mean/max; `0_DataPreparation/dwd_weather.csv`. Rain and temperature complete in training and test; sunshine missing on 88 test days (from 2019-05-05). Shows that a missing `Wettercode` means "no notable weather", not "dry" (23 % of those days had rain).
 - **Joins:** left joins on `Datum` keep 9,334 rows.
 - **Test period** 2018-08-01 – 2019-07-31 held back by the course.
 
@@ -70,7 +71,7 @@ See [`DECISIONS.md`](DECISIONS.md), entries of 2026-11-23.
 - **Group 4 gaps (53 days):** not in the data → treated as unknown, not as 0.
 - **Group 6:** forecast only on days when seasonal bread is on sale (manager knows this in advance).
 - **Kiel Week:** missing after the join → 0 (file lists only Kiel Week days).
-- **Wettercode:** not used (669 missing, not at random).
+- **Wettercode:** not used in training (669 missing, not at random). In data exploration only, "rain" = codes 60–69 (narrow, conservative); missing codes stay a separate group.
 - **Missing weather (3 sales days, 13 test days; `Bewoelkung` 10 days):** filled with the previous day's value (forward fill, past only).
 - **31 December peaks (group 5):** kept; a "New Year's Eve" feature will be added.
 
@@ -91,6 +92,7 @@ Confirmed by the team on 2026-11-23. Run with `uv run pytest checks` ([`checks/`
 
 ### 10. Findings 🤖
 <!-- What we learned, how sure we are, and what the data cannot tell. -->
+- **Hypothesis 1 (warm & dry → croissants): partly supported** (draft, 2026-11-24, [`katharina-warm.ipynb`](1_DatasetCharacteristics/katharina-warm.ipynb)). Raw link with temperature is strong (Spearman 0.65; ~110 € below 5 °C vs. 261 € at ≥ 25 °C), but mostly season: within the same month and weekday it shrinks to rho 0.13 (days > 4 °C warmer than the month's average: ~+6.6 % vs. a typical comparable day). "Dry" not supported: at equal temperature rainy days are not lower (from 15 °C even higher); season-adjusted difference only 1.3 %-points, reversed in summer. Limits: observed weather, one daily rain code, 6 summers, exploration used all 2013–2018 data.
 
 ### 11. Recommendation 👤
 <!-- What the decision-maker should do, under which conditions. Signed off by the team. -->
@@ -101,7 +103,8 @@ Confirmed by the team on 2026-11-23. Run with `uv run pytest checks` ([`checks/`
 <!-- Parking lot. Each item names who resolves it. -->
 - **Staffing:** could the same forecast support staff planning? Parked; later use. *Resolves: team.*
 - **Current practice:** how does the branch decide baking quantities today without a model? Unknown; the naive rule "same weekday last week" serves as stand-in reference (block 4). *Resolves: team, if instructors can tell.*
-- **Rain / dry for hypotheses 1 and 3:** these need `Wettercode`, which was decided not to be used (DECISIONS 2026-11-23). Use it after all (e.g. as a simple rain yes/no flag, missing = no notable weather), or test with `Bewoelkung` as a rough stand-in? *Resolves: team.*
+- **Rain / dry for hypotheses 1 and 3:** DWD rain amount (`Niederschlag_mm`) is now available and has no gaps in training or test. The Wettercode-based flag used for hypothesis 1 (DECISIONS 2026-11-24, missing code = dry; no clear effect on croissants) counts 23 % of missing-code days as dry although DWD measured rain. Define "rainy day" from DWD (threshold, e.g. > 0 mm or ≥ 1 mm?) and redo the rain explorations? *Resolves: team.*
+- **Sunshine in the test period:** DWD sunshine is missing for 88 test days (May–Jul 2019). Drop sunshine as a feature, or fill from a nearby station? *Resolves: team, before the first model with weather.*
 - **Data split:** how to split training / validation (by time, test period Aug 2018 – Jul 2019 set by the course). *Resolves: team, before the first model.*
 
 ## Decision log

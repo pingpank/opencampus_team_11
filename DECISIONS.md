@@ -2,6 +2,26 @@
 
 Newest first. One entry per decision taken at a stop point.
 
+## 2026-11-24: DWD weather data added as an additional source
+**Canvas block:** 5
+**Decision:** Daily observations of the DWD station Kiel-Holtenau (02564) are downloaded by `0_DataPreparation/dwd_weather.ipynb` and saved as `0_DataPreparation/dwd_weather.csv` (2012-01-01 – 2019-08-01, joined on `Datum`). The course file `wetter.csv` stays as it is. Which DWD columns become features, and how "rain" is defined, is not decided yet (see canvas, Open questions).
+**Reason:** A comparison showed that a missing `Wettercode` does not mean clear or dry weather: DWD measured rain on 23 % of those days. DWD measures rain amount and sunshine directly, is quality-controlled and has no gaps in rain and temperature for training and test.
+**Alternatives considered:** Keep only the course weather file; reanalysis data (e.g. Open-Meteo / ERA5) instead of station measurements.
+**Decided by:** Thore Pingpank
+
+## 2026-11-24: Wettercode used as rain flag for exploring hypothesis 1 only
+**Canvas block:** 2, 7
+**Decision:** In `1_DatasetCharacteristics/katharina-warm.ipynb`, a day counts as rainy if `Wettercode` is 50–99 (WMO precipitation codes); a missing code counts as dry. This is an exception for exploration; the modelling decision "Wettercode not used" (2026-11-23) stays unchanged.
+**Reason:** Hypothesis 1 needs "dry"; only `Wettercode` records precipitation.
+**Alternatives considered:** Cloud cover as stand-in; temperature only.
+**Decided by:** Katharina Helzel
+## 2026-11-23: "Rain" in data exploration = Wettercode 60–69
+**Canvas block:** 7
+**Decision:** Even though `Wettercode` is not used in training, when it is used for data exploration, a "rainy day" is defined narrowly as `Wettercode` 60–69 (rain at the time of observation). All other codes count as "no rain"; days without a code are kept as a separate group "code missing".
+**Reason:** A narrow definition is conservative: it only counts days that clearly had rain, not drizzle, showers, snow or rain in the past hour.
+**Alternatives considered:** Broad definition (codes 20–27, 29 and 50–99: any precipitation now or in the past hour).
+**Decided by:** Thore Pingpank
+
 ## 2026-11-23: Checks for block 8
 **Canvas block:** 8
 **Decision:** All four proposed check groups are kept: raw data, join, time & leakage, content & baseline (details in CANVAS block 8).
