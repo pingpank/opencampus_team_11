@@ -25,7 +25,7 @@ The **branch manager** decides **every day at closing time** how much of each of
 - *Data can answer:* daily turnover per group 2013-07-01 – 2018-07-31, with weekday, holidays, Kiel Week and weather as possible influences.
 - *Data cannot answer:* number of pieces to bake (no prices); true demand on sold-out days; anything about other branches.
 - *Thin basis:* group 6 (seasonal bread) – only 5 seasons (2013/14 – 2017/18), 292 days; result reported separately and flagged as uncertain. Kiel Week effect rests on only 5 Kiel Weeks (2014–2018).
-
+- test conflict
 **Hypotheses about what drives sales** (team, 2026-11-23; not yet tested):
 1. **Warm and dry weather → higher croissant sales (group 3).** *Data:* temperature available; "dry" needs `Wettercode`, which is currently not used (see Open questions). *Limit:* measured weather as forecast stand-in; separate weather from season.
 2. **During Kiel Week → more roll sales (group 2).** *Data:* `KielerWoche` flag. *Limit:* only 5 Kiel Weeks (2014–2018) – a thin basis.
