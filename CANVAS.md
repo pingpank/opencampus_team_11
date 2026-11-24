@@ -53,6 +53,7 @@ Details: [`docs/data-fact-sheet.md`](docs/data-fact-sheet.md). Source: meteolyti
 - **Sales:** 9,334 rows, one per (day, product group), only days with sales; 2013-07-01 – 2018-07-31. Key (`Datum`, `Warengruppe`) unique. 38 days without any sales (holidays); group 4 missing on 53 further days (2013–2016); group 6 only late Oct – early Jan (5 seasons). 31 Dec = extreme peak in group 5.
 - **Weather (observed, Kiel):** 2012-01-01 – 2019-08-01, 169 days without a row (3 in sales period, 13 in test period). `Wettercode` missing on 669 days, not at random (calmer, warmer days); `Bewoelkung` missing on 10 days.
 - **Kiel Week:** 9 days per year 2012–2019; 5 Kiel Weeks inside the sales period.
+- **DWD weather (Kiel-Holtenau, added 2026-11-24):** measured rain (mm), sunshine (h), cloud cover, temperature min/mean/max; `0_DataPreparation/dwd_weather.csv`. Rain and temperature complete in training and test; sunshine missing on 88 test days (from 2019-05-05). Shows that a missing `Wettercode` means "no notable weather", not "dry" (23 % of those days had rain).
 - **Joins:** left joins on `Datum` keep 9,334 rows.
 - **Test period** 2018-08-01 – 2019-07-31 held back by the course.
 
@@ -102,7 +103,8 @@ Confirmed by the team on 2026-11-23. Run with `uv run pytest checks` ([`checks/`
 <!-- Parking lot. Each item names who resolves it. -->
 - **Staffing:** could the same forecast support staff planning? Parked; later use. *Resolves: team.*
 - **Current practice:** how does the branch decide baking quantities today without a model? Unknown; the naive rule "same weekday last week" serves as stand-in reference (block 4). *Resolves: team, if instructors can tell.*
-- **Rain / dry for hypotheses 1 and 3:** these need `Wettercode`, which was decided not to be used (DECISIONS 2026-11-23). Use it after all (e.g. as a simple rain yes/no flag, missing = no notable weather), or test with `Bewoelkung` as a rough stand-in? For hypothesis 1, a rain flag was tried in exploration only (DECISIONS 2026-11-24) and showed no clear effect on croissants. *Resolves: team.*
+- **Rain / dry for hypotheses 1 and 3:** DWD rain amount (`Niederschlag_mm`) is now available and has no gaps in training or test. The Wettercode-based flag used for hypothesis 1 (DECISIONS 2026-11-24, missing code = dry; no clear effect on croissants) counts 23 % of missing-code days as dry although DWD measured rain. Define "rainy day" from DWD (threshold, e.g. > 0 mm or ≥ 1 mm?) and redo the rain explorations? *Resolves: team.*
+- **Sunshine in the test period:** DWD sunshine is missing for 88 test days (May–Jul 2019). Drop sunshine as a feature, or fill from a nearby station? *Resolves: team, before the first model with weather.*
 - **Data split:** how to split training / validation (by time, test period Aug 2018 – Jul 2019 set by the course). *Resolves: team, before the first model.*
 
 ## Decision log

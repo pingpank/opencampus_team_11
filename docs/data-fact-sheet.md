@@ -63,6 +63,15 @@ All numbers below come from running the profiling code; nothing is estimated.
 - **Coverage:** 9 days per year, 2012–2019. Within the sales period: **5 Kiel Weeks** (2014–2018, 45 days, all with sales). Kiel Week 2013 (06-22 – 06-30) ends before the sales data start. Kiel Week 2019 lies in the test period.
 - Non-Kiel-Week days must be set to 0 after the merge.
 
+## 5. `0_DataPreparation/dwd_weather.csv` – DWD weather (Kiel-Holtenau, added 2026-11-24)
+
+- **Source:** German Weather Service (DWD), daily climate data, station Kiel-Holtenau (02564), quality-controlled historical record ([directory](https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/daily/kl/historical/)); licence CC BY 4.0 (name DWD as source). Made by `0_DataPreparation/dwd_weather.ipynb`; checks in `checks/test_dwd_weather.py`.
+- **Shape / grain:** 2,631 rows × 13 columns, one row per day, `Datum` unique, 2012-01-01 – 2019-08-01. Column meanings and units: see the notebook.
+- **Same place as `wetter.csv`:** correlation of daily temperature 0.987, of cloud cover 0.887 (2,599 common days).
+- **Coverage:** every day of the training and test period has a row. **Rain (`Niederschlag_mm`) and temperature: no gaps** in training or test. Sunshine (`Sonnenschein_h`): complete in training, **missing from 2019-05-05 on (88 test days)** – DWD stopped measuring sunshine at this station. Cloud cover: empty on 11 training days (2017-10-30 – 11-09) and 25 test days. Before the sales period a block 2012-12-21 – 2013-04-30 is missing (no effect on the model). Snow depth mostly empty – do not use unchecked.
+- **Rain is measured 06:00 UTC on the day to 06:00 UTC next day** – it includes the night after closing.
+- **What `Wettercode` missing means (compared with DWD, 2026-11-24):** not "clear sky". On the 669 missing-code days DWD shows mean cloud cover 3.6 eighths, only 19 % fully clear (≤ 1/8), and rain on 23 % (154 days; 20 days > 5 mm). Compared month by month, these days are almost identical to days with codes 00–03 (dry 77 % vs 75 %, cloud 3.6 vs 3.6, sunshine 8.0 vs 8.0 h). So missing ≈ "no notable weather at observation time", not "dry".
+
 ## 4. Joins (left join on `Datum`, sales as the base)
 
 - **Sales + weather:** 1,816 of 1,819 sales days have a weather row (3 without: 1 in 2016, 2 in 2017). Row count stays 9,334 → 9,334.
